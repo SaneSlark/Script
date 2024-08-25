@@ -2,14 +2,14 @@
 
 echo "
 #----------------------------------------------------------
-# Debian 12 系统优化脚本
+# Debian 系统优化脚本
 #
-# 作者: Hehua (由 Google AI 驱动)
-# 版本: 1.12
-# 日期: 2024-08-08
+# 作者: SaneSlark (由 ChatGPT AI 驱动)
+# 版本: 1.25
+# 日期: 2024-08-25
 #
 # 说明:
-#   此脚本用于优化 Debian 12 系统，提供以下选项：
+#   此脚本用于优化 Debian 系统，提供以下选项：
 #     1. 修改提示语
 #     2. 更新 apt 源
 #     3. 设置全局命令
@@ -18,8 +18,8 @@ echo "
 #     6. 配置网络
 #
 # 使用方法:
-#   1. 运行 chmod +x debian12_optimize.sh
-#   2. 执行 sudo ./debian12_optimize.sh
+#   1. 运行 chmod +x Debian_Optimize.sh
+#   2. 执行 sudo ./Debian_Optimize.sh
 #-----------------------------------------------------------
 "
 # 颜色定义
@@ -335,23 +335,23 @@ update_apt_sources() {
   echo  "${YELLOW}增加国内源...${NC}"
 
   #echo "deb https://mirrors.ustc.edu.cn/debian/ bullseye main contrib non-free" | tee -a /etc/apt/sources.list > /dev/null
-  #echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian bullseye main contrib non-free" | tee -a /etc/apt/sources.list > /dev/null
 
   # 获取系统版本号
   version_id=$(grep -Po 'VERSION_ID="\K.*?(?=")' /etc/os-release)
   
   # 判断版本号并设置软件源
-  if [[ -z "$version_id" ]]; then
+  if [ -z "$version_id" ]; then
       echo "无法获取系统版本号，请检查 /etc/os-release 文件。"
       exit 1
   fi
   
+  # 根据系统版本号设置软件源URL
   case "$version_id" in
       12)
           source_url="https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm"
           ;;
       11)
-          source_url="https://mirrors.tuna.tsinghua.edu.cn/debian bullseye"
+          source_url="https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye"
           ;;
       *)
           echo "不支持的系统版本：$version_id"
@@ -359,12 +359,17 @@ update_apt_sources() {
           ;;
   esac
   
-  # 添加软件源
-  if echo "deb $source_url main contrib non-free" | tee -a /etc/apt/sources.list >/dev/null; then
-      echo "软件源添加成功！"
+  # 检查是否已经添加了该软件源
+  if grep -q "deb $source_url" /etc/apt/sources.list; then
+      echo "软件源 '$source_url' 已存在，不需要重复添加。"
   else
-      echo "添加软件源失败，请检查权限和路径。"
-      exit 1
+      # 添加软件源
+      if echo "deb $source_url main contrib non-free" | tee -a /etc/apt/sources.list > /dev/null; then
+          echo "软件源 '$source_url' 添加成功！"
+      else
+          echo "添加软件源 '$source_url' 失败，请检查权限和路径。"
+          exit 1
+      fi
   fi
 
   sleep 3
