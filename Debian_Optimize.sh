@@ -348,7 +348,7 @@ update_apt_sources() {
   
   case "$version_id" in
       12)
-          source_url="https://mirrors.ustc.edu.cn/debian/ bookworm"
+          source_url="https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm"
           ;;
       11)
           source_url="https://mirrors.tuna.tsinghua.edu.cn/debian bullseye"
@@ -367,13 +367,14 @@ update_apt_sources() {
       exit 1
   fi
 
-
   sleep 3
   
   echo  "${YELLOW}更新 apt 源...${NC}"
 
   apt update
-  
+
+  echo  "${YELLOW}安装 sudo vim...${NC}"
+
   apt install sudo vim -y
 
   echo  "${GREEN}apt 源更新完成!${NC}"

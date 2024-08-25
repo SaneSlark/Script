@@ -1,4 +1,4 @@
-# Win11-Replacer
+# Win11_Classic_ContextMenu
 
 ## 使用方法：
 
@@ -19,8 +19,7 @@
 2.Select "1" to switch to the classic menu of "Windows 10", and then automatically restart the system to take effect.
 
 
-
-# OneDriveUninstaller
+# OneDrive_Uninstaller
 
 在Windows 10/11 中完全卸载OneDrive的批处理脚本。
 
@@ -38,6 +37,19 @@
 
 无论如何，一定要备份你的东西！
 
-源文件来自这里：
+# Fail2Ban 自动安装和配置脚本
 
-https://github.com/TERRAOperative/OneDrive-Uninstaller
+## 说明:
+
+此脚本用于多款Linux 系统，提供安全防护，可自动封锁可疑ssh攻击者。
+
+# Debian 系统优化脚本
+
+## 说明:
+此脚本用于优化 Debian 12 系统，提供以下选项：
+1. 修改提示语
+2. 更新 apt 源
+3. 设置全局命令
+4. 设置 ls 命令(仅限root用户有效)
+5. 重命名主机名
+6. 配置网络
