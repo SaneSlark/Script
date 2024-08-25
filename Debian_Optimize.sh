@@ -15,7 +15,8 @@ echo "
 #     3. 设置全局命令
 #     4. 设置 ls 命令(仅限root用户有效)
 #     5. 重命名主机名
-#     6. 配置网络
+#     6. 配置主机网络
+#     7. ssh设置(修改端口root登陆)
 #
 # 使用方法:
 #   1. 运行 chmod +x Debian_Optimize.sh
@@ -469,6 +470,92 @@ modify_prompt() {
   esac
 }
 
+
+# ssh配置
+configure_ssh() {
+  # 定义 /etc/ssh/sshd_config 文件的备份路径
+  local backup_sshd="/etc/ssh/sshd_config.bak"
+  if [ -f "$backup_sshd" ]; then
+    echo "${YELLOW}发现 sshd 备份文件已存在，跳过备份操作.${NC}"
+  else
+    echo "${YELLOW}备份 sshd 文件到 ${backup_sshd}${NC}"
+    cp /etc/ssh/sshd_config "$backup_sshd"
+  fi
+
+  echo  "  ${GREEN}1)${NC} 修改ssh端口"
+  echo  "  ${GREEN}2)${NC} root用户登录"
+  read -p "请输入选项 (1-2): " sshd_option
+
+  case $sshd_option in
+    1)
+        local common_ports="80 443 21 23 25 53 69 110 111 123 137 138 139 143 161 389 465 636 3306 3389 5900 5901 8080"
+        while true; do
+        read -p "请输入新端口（0-65535）: " sshd_port
+        # 验证输入的端口是否在有效范围内
+        if ! echo "$sshd_port" | grep -E '^[0-9]{1,5}$' > /dev/null || [ "$sshd_port" -lt 0 ] || [ "$sshd_port" -gt 65535 ]; then
+            echo "错误：输入的端口号无效，请输入0到65535之间的数字。"
+            continue
+        fi
+        # 检查端口是否在常用端口列表中
+        for port in $common_ports; do
+            if [ "$sshd_port" -eq "$port" ]; then
+                echo "错误：端口 $sshd_port 是常用端口，请选择一个不常用的端口。"
+                continue 2
+            fi
+        done
+        # 如果输入的端口号有效且不在常用端口列表中，退出循环
+        break
+       done
+
+      # 检查 /etc/ssh/sshd_config.d/sshd.conf 是否已设置端口
+      if grep -q "^Port" /etc/ssh/sshd_config.d/sshd.conf; then
+          sed -i 's/^Port.*/Port '"$sshd_port"'/' /etc/ssh/sshd_config.d/sshd.conf
+          echo "${YELLOW}端口修改完成!${NC}"
+      else
+          echo "Port $sshd_port" | tee -a /etc/ssh/sshd_config.d/sshd.conf > /dev/null
+          echo "${GREEN}端口修改完成!${NC}"
+      fi
+
+      systemctl restart sshd
+
+      read -p "按任意键返回主菜单或输入 q 退出脚本: " choice
+      if [ "$choice" = "q" -o "$choice" = "Q" ]; then
+        exit 0
+      else
+        main_menu
+      fi
+      ;;
+
+    2)
+      # 检查是否有 /etc/ssh/sshd_config.d/sshd.conf 已允许 root 登录
+      if grep -q "^PermitRootLogin" /etc/ssh/sshd_config.d/sshd.conf; then
+          # 进一步检查是否已经是 yes
+          if grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config.d/sshd.conf; then
+              echo "${YELLOW}已允许 root 用户登录，无需修改.${NC}"
+          else
+              sudo sed -i 's/^PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config.d/sshd.conf
+              echo "${YELLOW}已允许 root 用户登录.${NC}"
+          fi
+      else
+          echo "PermitRootLogin yes" | tee -a /etc/ssh/sshd_config.d/sshd.conf > /dev/null
+          echo "${GREEN}已允许 root 用户登录.${NC}"
+      fi
+
+      systemctl restart sshd
+
+      read -p "按任意键返回主菜单或输入 q 退出脚本: " answer
+      if [ "$answer" = "q" -o "$answer" = "Q" ]; then
+        exit 0
+      else
+        main_menu
+      fi
+      ;;
+    *)
+      echo  "${RED}无效的选项!${NC}"
+      ;;
+  esac
+}
+
 # 主菜单
 main_menu() {
   local choice
@@ -485,10 +572,11 @@ main_menu() {
     echo "  ${GREEN}3)${NC} 设置全局命令"
     echo "  ${GREEN}4)${NC} 设置 ls 命令(仅限root用户有效)"
     echo "  ${GREEN}5)${NC} 修改主机名称"
-    echo "  ${GREEN}6)${NC} 配置网络"
+    echo "  ${GREEN}6)${NC} 配置主机网络"
+    echo "  ${GREEN}7)${NC} ssh设置(修改端口root登陆)"
     echo "  ${GREEN}q)${NC} 退出"
 
-    read -p "请输入选项 (1-6 或 q): " choice
+    read -p "请输入选项 (1-7 或 q): " choice
 
     case $choice in
       1)
@@ -508,6 +596,9 @@ main_menu() {
         ;;
       6)
         configure_network
+        ;;
+      7)
+        configure_ssh
         ;;
       q)
         echo "${GREEN}退出脚本.${NC}"
