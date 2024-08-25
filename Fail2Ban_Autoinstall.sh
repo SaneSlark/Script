@@ -4,9 +4,9 @@ echo "
 #----------------------------------------------------------
 # Fail2Ban自动安装和配置脚本
 #
-# 作者: Hehua (由 Google AI 驱动)
-# 版本: 1.12
-# 日期: 2024-08-08
+# 作者: SaneSlark (由 ChatGPT AI 驱动)
+# 版本: 1.25
+# 日期: 2024-08-25
 #
 # 说明:
 #   此脚本用于多款Linux 系统，提供安全防护，可自动封锁可疑ssh攻击者。
@@ -37,10 +37,8 @@ detect_os() {
         if [ "$ID" = "debian" ]; then
             # 读取 /etc/os-release 中的 VERSION_ID 变量，获取版本号
             version_id=$VERSION_ID
-            # 判断版本号是否为 12
             if [ "$version_id" = "12" ]; then
                 os_choice="1"
-            # 判断版本号是否为 11
             elif [ "$version_id" = "11" ]; then
                 os_choice="2"
             fi
@@ -71,7 +69,6 @@ if [ -z "$os_choice" ]; then
 fi
 
 # 根据用户选择执行不同的命令
-
 case "$os_choice" in
     1)
         echo "Installing Fail2Ban on Debian."
@@ -83,9 +80,7 @@ case "$os_choice" in
         backend="systemd"
         SERVICE_MANAGER="systemctl"
         ;;
-
     2)
-
         echo "Installing Fail2Ban on Ubuntu."
         apt-get update
         apt-get install -y fail2ban
@@ -103,7 +98,6 @@ case "$os_choice" in
         backend="auto"
         SERVICE_MANAGER="service"
         ;;
-
     4)
         echo "Installing Fail2Ban on CentOS/Fedora/RHEL."
         yum install -y fail2ban
@@ -182,3 +176,4 @@ fi
 
 sleep 5
 echo "Fail2Ban installation and basic configuration completed."
+
