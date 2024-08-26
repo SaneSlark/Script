@@ -61,8 +61,8 @@ sleep 3
 # 如果自动检测失败，则提示用户手动选择
 if [ -z "$os_choice" ]; then
     echo "自动检测操作系统失败。请选择操作系统类型:"
-    echo "1 - Debian"
-    echo "2 - Ubuntu"
+    echo "1 - Debian 12"
+    echo "2 - Ubuntu/Debian 11"
     echo "3 - FreeBSD"
     echo "4 - CentOS/Fedora/RHEL"
     read -r os_choice
