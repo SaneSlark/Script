@@ -79,7 +79,6 @@ configure_network() {
 
   case $network_option in
     1)
-
       local interfacesbak="/etc/network/interfaces.bak"
       
       # 检查 /etc/network/interfaces  是否已备份，如果没有则备份
@@ -233,9 +232,7 @@ configure_network() {
 
 # 设置全局命令
 set_aliases() {
-
   # 定义文件和备份路径
- 
   local profile_bak="/etc/profile.bak"
   local skel_bashrc_bak="/etc/skel/.bashrc.bak"
   
@@ -308,8 +305,7 @@ set_ls_color() {
 
 # 更新 apt 源
 update_apt_sources() {
-
-# 定义 sources.list 文件路径
+  # 定义 sources.list 文件路径
   local sources_file="/etc/apt/sources.list"
   local backup_file="/etc/apt/sources.list.bak"
 
@@ -395,16 +391,32 @@ update_apt_sources() {
 
 #重命名主机名
 update_hostname() {
-
+  while true; do
   read -p "请输入主机名: " hostname_option
 
-  echo  "${YELLOW}更新主机名...${NC}"
+  # 检查主机名合法性（简单验证）
+  if ! echo "$hostname_option" | grep -Eq '^[a-zA-Z0-9.-]+$' || [ ${#hostname_option} -lt 1 ] || [ ${#hostname_option} -gt 63 ]; then
+    echo "${YELLOW}主机名无效! 请确保它只包含字母、数字、破折号、点，并且长度在 1 到 63 个字符之间。${NC}"
+    else
+      break
+  fi
+  done
+  echo "${YELLOW}更新主机名...${NC}"
+
   # 设置主机名
   hostnamectl set-hostname "$hostname_option"
-  # 显示新的主机名
-  hostname
 
-  echo  "${GREEN}更新完成!${NC}"
+  # 更新 /etc/hosts 文件
+  if grep -q "127.0.1.1" /etc/hosts; then
+     sed -i "s/127.0.1.1\s.*/127.0.1.1   $hostname_option/" /etc/hosts
+  else
+    echo "127.0.1.1   $hostname_option" | sudo tee -a /etc/hosts
+  fi
+
+  # 显示新的主机名
+  echo "新的主机名是: $(hostname)"
+
+  echo "${GREEN}更新完成!${NC}"
 
   read -p "按任意键返回主菜单或输入 q 退出脚本: " choice
   if [ "$choice" = "q" -o "$choice" = "Q" ]; then
@@ -470,7 +482,6 @@ modify_prompt() {
   esac
 }
 
-
 # ssh配置
 configure_ssh() {
   # 定义 /etc/ssh/sshd_config 文件的备份路径
@@ -503,8 +514,7 @@ configure_ssh() {
                 continue 2
             fi
         done
-        # 如果输入的端口号有效且不在常用端口列表中，退出循环
-        break
+        break  # 如果输入的端口号有效且不在常用端口列表中，退出循环。
        done
 
       # 检查 /etc/ssh/sshd_config.d/sshd.conf 是否已设置端口
@@ -575,7 +585,6 @@ main_menu() {
     echo "  ${GREEN}6)${NC} 配置主机网络"
     echo "  ${GREEN}7)${NC} ssh设置(修改端口root登陆)"
     echo "  ${GREEN}q)${NC} 退出"
-
     read -p "请输入选项 (1-7 或 q): " choice
 
     case $choice in
