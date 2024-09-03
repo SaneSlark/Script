@@ -4,7 +4,8 @@
 @rem Feel free to distribute freely as long as you leave this entire file unchanged and intact,
 @rem and if you do make changes and adaptions, don't be a dick about not attributing where due.
 @rem And most importantly, peace out and keep it real.
-
+@chcp 65001    
+@cls 
 @echo OFF
 
 @REM Set variables for coloured text
@@ -137,12 +138,12 @@ GOTO CLEAN
 
    echo.
    echo.
-   echo 系统找不到指定的注册表项或值。
-   echo 出现错误是正常的，这意味着注册表项已经不存在。
+   echo 系统找不到指定的注册表项或值.
+   echo 出现错误是正常的,这意味着注册表项已经不存在了.
    echo.
    echo -----------------------------------------------
    echo.
-   echo OneDrive卸载和清理已完成.
+   echo OneDrive 已经卸载和清理完成.
    echo.
 
    PAUSE
@@ -152,9 +153,27 @@ GOTO CLEAN
 
   
 @rem Settings for text colour
-
 :colorEcho
-echo off
-<nul set /p ".=%DEL%" > "%~2"
-findstr /v /a:%1 /R "^$" "%~2" nul
-del "%~2" > nul 2>&1i
+@echo off
+setlocal enabledelayedexpansion
+
+rem Set the color code for the specific text
+if "%1"=="0C" ( 
+    set "colorCode=4C" 
+) else if "%1"=="0A" ( 
+    set "colorCode=2A" 
+) else if "%1"=="0E" ( 
+    set "colorCode=6E"
+) else (
+    set "colorCode=%1"
+)
+
+rem Change the console color
+color !colorCode!
+echo %~2
+
+rem Reset the console color back to normal
+color 07
+
+endlocal
+exit /b

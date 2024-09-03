@@ -1,5 +1,5 @@
 #!/bin/sh
-## Easy install Jopens6.1 in FreeBSD13 by SaneSlark
+#Easy install Jopens6.1 in FreeBSD13 by SaneSlark
 
 # 1. Install the third party software
 pkg update -y 
@@ -172,7 +172,7 @@ cp "$standalone_xml" "$standalone_xml.bak"
 echo "Define the new JAVA_OPTS values"
 sed -i '' 's/-Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m/-Xms8g -Xmx16g -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=512m/g' "$standalone_conf"
 # 更新standalone-full.xml配置
-# 例如，替换带有GD字符的省份代码为GU
+# 替换带有GD字符的省份代码为GU
 sed -i '' 's/GD/GU/g' "$standalone_xml"
 echo "WildFly configuration has been updated successfully."
 sleep 6
