@@ -345,7 +345,7 @@ update_apt_sources() {
   # 根据系统版本号设置软件源URL
   case "$version_id" in
       12)
-          source_url="https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm"
+          source_url="https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm non-free-firmware"
           ;;
       11)
           source_url="https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye"
