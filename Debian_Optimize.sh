@@ -537,7 +537,11 @@ configure_ssh() {
       ;;
 
     2)
-      # 检查是否有 /etc/ssh/sshd_config.d/sshd.conf 已允许 root 登录
+      # 检查文件是否存在，如果不存在则创建
+      if [ ! -f /etc/ssh/sshd_config.d/sshd.conf ]; then
+         touch /etc/ssh/sshd_config.d/sshd.conf
+      fi
+      # 检查是否已允许 root 登录
       if grep -q "^PermitRootLogin" /etc/ssh/sshd_config.d/sshd.conf; then
           # 进一步检查是否已经是 yes
           if grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config.d/sshd.conf; then
