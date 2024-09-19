@@ -253,9 +253,8 @@ set_aliases() {
 
   echo  "${YELLOW}正在设置全局命令...${NC}"
 
-  sed -i '$i\
-  export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:$PATH' /etc/profile
-  
+  echo 'export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:$PATH' | tee -a /etc/profile > /dev/null
+
   sleep 3
 
   . /etc/profile
