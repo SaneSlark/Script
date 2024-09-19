@@ -251,22 +251,31 @@ set_aliases() {
       echo "${YELLOW}备份文件 $skel_bashrc_bak 已存在，跳过备份操作${NC}"
   fi
 
-  echo  "${YELLOW}正在设置全局命令...${NC}"
+  echo  "正在设置全局命令..."
+  
+  # 定义要添加的内容
+  PathLine='export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:$PATH'
 
-  echo 'export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:$PATH' | tee -a /etc/profile > /dev/null
-
+  # 检查文件中是否已包含该行
+  if ! grep -Fxq "$PathLine" /etc/profile; then
+      echo "$PathLine" | tee -a /etc/profile > /dev/null
+      echo "${YELLOW}命令环境成功添加到 /etc/profile${NC}"
+  else
+      echo "${RED}命令环境已存在于 /etc/profile 中${NC}"
+  fi
+  
   sleep 3
 
   . /etc/profile
   
-  echo  "${YELLOW}正在为用户添加命令...${NC}"
+  echo  "正在修改.bashrc文件..."
   sed -i "s/^# *alias ll='ls -l'$/alias ll='ls -l'/" /etc/skel/.bashrc
   sed -i "s/^# *alias la='ls -A'$/alias la='ls -A'/" /etc/skel/.bashrc
   sed -i "s/^# *alias l='ls -CF'$/alias l='ls -CF'/" /etc/skel/.bashrc
 
   sed -i "s/.*# *alias dir='dir --color=auto'.*/alias dir='dir --color=auto'/" /etc/skel/.bashrc
 
-  echo  "${GREEN}设置完成!${NC}"
+  echo  "${GREEN}全部设置完成!${NC}"
   read -p "按任意键返回主菜单或输入 q 退出脚本: " choice
   if [ "$choice" = "q" -o "$choice" = "Q" ]; then
     exit 0
@@ -286,7 +295,7 @@ set_ls_color() {
   sed -i "s/^# *alias ll='ls \$LS_OPTIONS -l'$/alias ll='ls \$LS_OPTIONS -l'/" /root/.bashrc
   sed -i "s/^# *alias l='ls \$LS_OPTIONS -lA'$/alias l='ls \$LS_OPTIONS -lA'/" /root/.bashrc
   
-  echo  "${YELLOW}仅限root用户有效${NC}"
+  echo  "${RED}仅限root用户有效${NC}"
   
   . /root/.bashrc
   cat /root/.bashrc
