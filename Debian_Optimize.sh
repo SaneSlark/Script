@@ -380,13 +380,12 @@ update_apt_sources() {
   sleep 3
   
   echo  "${YELLOW}更新 apt 源...${NC}"
-
   apt update
-
   echo  "${YELLOW}安装 sudo vim...${NC}"
-
   apt install sudo vim -y
-
+  echo  "${YELLOW}时区调整为北京时间${NC}"
+  timedatectl set-timezone Asia/Shanghai
+  timedatectl
   echo  "${GREEN}apt 源更新完成!${NC}"
 
   read -p "按任意键返回主菜单或输入 q 退出脚本: " choice
